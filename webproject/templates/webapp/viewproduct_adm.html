@@ -1,0 +1,29 @@
+{% extends 'webapp/adminhome.html' %}
+{% block title %}Product List {%endblock%}
+
+{% block content %}
+<br>
+<h1>Products</h1>
+<br>
+<hr>
+ <div class="container">
+    <div class="row">
+      {% for product in products %}
+      <div class="col-md-4">
+        <div class="card mb-4">
+          <img src="{{ product.image.url }}" class="card-img-top">
+          <div class="card-body">
+            <h5 class="card-title">{{ product.name }}</h5>
+            <p class="card-text">description: {{ product.description }}</p>
+            <p class="card-text">price: {{ product.price }}</p>
+            <p class="card-text">quantity: {{ product.quantity }}</p>
+            <div class="text-center">
+              <a href="{% url 'product_detail' product.id %}" class="btn btn-primary">View Details</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'webapp/adminhome.html' %}
+
+{% block content %}
+    <br><br>
+    <div class="container">
+        <table class="table">
+            <tr>
+                <td>Item Name</td>
+                <td>{{ product.name }}</td>
+            </tr>
+            <tr>
+                <td>Price</td>
+                <td>{{ product.price }}</td>
+            </tr>
+            <tr>
+                <td>Quantity</td>
+                <td>{{product.quantity }}</td>
+            </tr>
+        </table>
+        <div class="text-center">
+            <a href="{% url 'product_update' product_id=product.id %}" class="btn btn-primary">Update</a>
+            <form method="post" action="{% url 'product_delete' product.id %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary" >Delete</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

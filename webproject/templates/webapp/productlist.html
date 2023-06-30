@@ -1,0 +1,33 @@
+{% extends 'webapp/adminhome.html' %}
+{% block content %}
+<h1> All products </h1>
+<hr>
+
+<div class="row">
+  {% if products %}
+  {% for product in products %}
+    <div class="col-md-6">
+      <div class="card mb-3" style="max-width: 400px; margin-left:200px;">
+        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+        <div class="card-body">
+          <h5 class="card-title">{{ product.name }}</h5>
+          <p class="card-text"></p>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><b>product Name       :      </b>{{ product.name }}</li>
+          <li class="list-group-item"><b>product description  :      </b>{{ product.description }}</li>
+          <li class="list-group-item"><b>product price        :      </b>:{{ product.price}}</li>
+          <li class="list-group-item"><b>product quantity     :      </b>:{{ product.quantity}}</li>
+        </ul>
+        <a href="{% url 'addcart' product.id %}" class="btn btn-primary" >Add to CART</a>
+      </div>
+    </div>
+    {% if forloop.counter|divisibleby:2 and not forloop.last %}
+      </div><div class="row">
+    {% endif %}
+    {% endfor %}
+  </div>
+{% else %}
+  <p>No products available.</p>
+{% endif %}
+{% endblock %} 

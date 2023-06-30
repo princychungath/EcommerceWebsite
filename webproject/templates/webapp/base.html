@@ -1,0 +1,85 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homepage</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css">
+  <style>
+    h2 {
+        color: darkblue;
+    }
+    h1{
+      margin-left: 200px;
+    }
+    body {
+      padding-top: 60px;
+      background-color:white;
+    }
+    .sidebar {
+      position: fixed;
+      width: 150px;
+      height: 100vh;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      padding: 48px 0;
+      background-color: #333;
+      color: #fff;
+    }
+    .sidebar .nav-link {
+      color: #fff;
+      padding: 10px;
+      display: block;
+    }
+    .content {
+      margin-left: 50px; 
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <ul class="nav flex-column">
+      <!-- <li class="nav-item">
+        <a class="nav-link" href="#"><b>User Home</b></a>
+      </li> -->
+      {% if user.is_authenticated %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'cart_view' %}">Cart</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'profile' %}">profile</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'order_view' %}">orders</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+      </li>
+      {% else %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'home' %}"><b>User Home</b></a>
+      </li> 
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'viewproduct' %}">View Product</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'login' %}">Log In</a>
+      </li>
+    </ul>
+    {% endif %}
+
+  </div>
+  {% block content %}
+  <div class="container  justify-content-center">
+    <h1><b>Welcome to Ecommerce Website</b></h1>
+  </div>
+  {% endblock %}
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

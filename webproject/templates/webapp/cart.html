@@ -1,0 +1,51 @@
+{% extends 'webapp/base.html' %}
+
+{% block content %}
+ <div class="container" style="margin-left:200px;">
+           <h2>Your Cart Items</h2>
+           <hr>
+        {% if cart_items %}
+            {% for cart_item in cart_items %}      
+            <div class="container">
+                <table class="table">
+                    <tr>
+                        <td>Product</td>
+                        <td><img src="{{ cart_item.product.image.url }}"  height="50px"></td>
+                    </tr>
+                    <tr>
+                        <td>Product Name</td>
+                        <td>{{cart_item.product.name}}</td>
+                    </tr>
+                    <tr>
+                        <td>Price</td>
+                        <td>{{cart_item.product.price}} Rs</td>
+                    </tr>
+                    <tr>
+                        <td>Quantity</td>
+                        <td>{{cart_item.quantity}}</td>
+                        <td>
+                            <form method="POST" action="{% url 'update_cart' cart_item.id %}">
+                            {% csrf_token %}
+                            <input type="number" min="1" value="{{ cart_item.quantity }}" name="quantity">
+                            <button type="submit">quantity</button>
+                            <form method="post" action="{% url 'delete_cart' cart_item.id %}" name="delete">
+                                {% csrf_token %}
+                                <button type="submit" >Delete</button>
+                            </form>
+                            </form>
+                        </td>
+                    </tr> 
+                </table>
+            {% endfor %}
+            <div>
+                <a href="{% url 'order_view' %}" class="btn btn-danger">Order Now</a>
+            </div>
+        {% else %}
+            <class="mt-4"><br>Your cart empty! </h1>   
+        {% endif %}
+    </div>
+{% endblock %}
+
+
+
+
