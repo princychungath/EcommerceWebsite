@@ -47,24 +47,24 @@
       </li> -->
       {% if user.is_authenticated %}
       <li class="nav-item">
+        <a class="nav-link" href="#"><b>User Home</b></a>
+      </li> 
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'productview' %}">View Product</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" href="{% url 'cart_view' %}">Cart</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="{% url 'profile' %}">profile</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'order_view' %}">orders</a>
+        <a class="nav-link" href="{% url 'totalorder' %}">orders</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="{% url 'logout' %}">Logout</a>
       </li>
       {% else %}
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'home' %}"><b>User Home</b></a>
-      </li> 
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'viewproduct' %}">View Product</a>
-      </li>
       <li class="nav-item">
         <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
       </li>

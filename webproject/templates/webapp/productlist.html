@@ -1,8 +1,7 @@
-{% extends 'webapp/adminhome.html' %}
+{% extends 'webapp/base.html' %}
 {% block content %}
 <h1> All products </h1>
 <hr>
-
 <div class="row">
   {% if products %}
   {% for product in products %}
@@ -31,3 +30,4 @@
   <p>No products available.</p>
 {% endif %}
 {% endblock %} 
+

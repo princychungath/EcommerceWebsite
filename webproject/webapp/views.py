@@ -1,7 +1,8 @@
 from django.contrib.auth import views as auth_views
-from .forms import ProductForm
+from django.contrib.auth.models import User
+from .forms import ProductForm,OrderForm
 from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView,LogoutView
 from django.urls import reverse_lazy
 from django.views.generic import CreateView,DetailView
 from .models import Product,Cart,CartItem,Order,OrderItems
@@ -9,7 +10,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views import View
 from django.contrib.auth import authenticate, login
-
+from django.http import HttpResponse
 
 
 def home(request):
@@ -19,7 +20,11 @@ class MySignUpView(CreateView):
     form_class = UserCreationForm
     template_name = 'webapp/signup.html'
     success_url = reverse_lazy('login')
-  
+
+
+@login_required    
+class MyLogoutView(LogoutView):
+    pass
 
 class LoginView(View):
     def get(self, request):
@@ -39,7 +44,6 @@ class LoginView(View):
                     return redirect('adminhome')
                 else:
                     return redirect('home')
-
         context = {'form': form}
         return render(request, 'webapp/login.html', context)
 
@@ -47,11 +51,7 @@ class LoginView(View):
 def adminhome(request):
     return render(request,'webapp/adminhome.html')
 
-@login_required    
-class MyLogoutView(LogoutView):
-    success_url = reverse_lazy('home')
-
-def viewproduct(request):
+def productview(request):
     products = Product.objects.all()
     return render(request, 'webapp/productlist.html', {'products': products})
 
@@ -106,50 +106,101 @@ def profile(request):
     return render(request,'webapp/profile.html')
 
 @login_required
+def totalorder(request):
+    order_items = OrderItems.objects.all()
+    context = {'order_items': order_items}
+    return render(request, 'webapp/orderlists.html', context)
+
+
+
+@login_required
 def order_view(request):
     user = request.user
     cart = user.cart
     cart_items = CartItem.objects.filter(cart=cart)
     total_price = 0
+
     for cart_item in cart_items:
-        total_price += cart_item.product.price * cart_item.quantity
+        product = cart_item.product
+        quantity_to_buy = cart_item.quantity
+
+        if product.quantity >= quantity_to_buy:
+            total_price += product.price * quantity_to_buy
+            product.quantity -= quantity_to_buy
+            product.save()
+            OrderItems.objects.create(order=order, product=product, quantity=quantity_to_buy)
+
     order = Order.objects.create(user=user, total_price=total_price)
-    for cart_item in cart_items:
-        OrderItems.objects.create(
-            order=order,
-            product=cart_item.product,
-            quantity=cart_item.quantity,
-        )
-    # cart_items.delete()
-    order_items = OrderItems.objects.filter(order=order)
+
+    order_id = request.GET.get('order_id') or request.session.get('order_id')
+    if order_id:
+        order = Order.objects.get(id=order_id)
+        order_items = OrderItems.objects.filter(order=order)
+    else:
+        order_items = []
+
+    request.session['order_id'] = order.id
+
     context = {
         'order': order,
         'order_items': order_items,
+        'total_price': total_price,
     }
     return render(request, 'webapp/order.html', context)
 
+
+def proced_order(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id)
+    except Order.DoesNotExist:
+        return redirect('order_not_found')
+
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        number = request.POST.get('number')
+        payment = request.POST.get('payment')
+        items = request.POST.get('items')
+        total_cost = order.total_cost
+        order.name = name
+        order.number = number
+        order.payment = payment
+        order.items = items
+        order.total_cost = total_cost
+        order.save()
+        message = 'Order placed successfully!'
+        return HttpResponse(message)
+
+    context = {
+        'order': order
+    }
+    return render(request, 'webapp/orderconf.html', context)
+
+
 @login_required
-def addproduct_adm(request):    
+def addproduct_adm(request):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
-            product = form.save(commit=False)
-            product.save()
-            return redirect('admin_add_product')
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect('viewproduct_adm')
     else:
         form = ProductForm()
+    return render(request, 'webapp/admin_addproduct.html', {'form': form})
 
-    context = {"form": form}
-    return render(request, 'webapp/admin_addproduct.html',context)
+
 @login_required   
 def viewproduct_adm(request):
     products = Product.objects.all()
     return render(request, 'webapp/viewproduct_adm.html', {'products': products})
 
+
 @login_required
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     return render(request, 'webapp/product_details.html', {'product': product})
+
 
 @login_required
 def product_update(request, product_id):
@@ -158,40 +209,25 @@ def product_update(request, product_id):
         form = ProductForm(request.POST, instance=product)
         if form.is_valid():
             form.save()
-            return redirect('product_detail')
+            return redirect('viewproduct_adm')
     else:
         form = ProductForm(instance=product)
     return render(request, 'webapp/update.html', {'form': form})
 
+
+
 @login_required
-def product_delete(request, product_id):
-    product = get_object_or_404(product, id=product_id) 
+def product_delete(request,product_id):
+    product = get_object_or_404(product,id=product_id) 
     if request.method == 'POST':
         product.delete()
-        return redirect('product_detail')
-        
+        return redirect('viewproduct_adm')
+
+
 @login_required
 def customers(request):
-    customers = Cart.objects.all()
+    customers =User.objects.all()
     return render(request,'webapp/customers.html', {'customers': customers})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

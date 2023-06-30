@@ -1,14 +1,22 @@
 {% extends 'webapp/adminhome.html' %}
+{% block title%}Customers List{%endblock%}
 
 {% block content %}
-  <div class="container">
-    {% for customer in customers %}
-      <table class="table">
+<h1>Customers List</h1>
+<table class="table">
+    <thead>
         <tr>
-          <td>Customer Name</td>
-          <td>{{customer.name}}</td>
+            <th>ID</th>
+            <th>Username</th>
         </tr>
-      </table>
-    {% endfor %}
-  </div>
+    </thead>
+    <tbody>
+        {% for customer in customers %}
+        <tr>
+            <td>{{ customer.id }}</td>
+            <td>{{ customer.username}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

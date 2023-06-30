@@ -18,7 +18,8 @@
             </tr>
         </table>
         <div class="text-center">
-            <a href="{% url 'product_update' product_id=product.id %}" class="btn btn-primary">Update</a>
+            <a href="{% url 'product_update' product.id %}" class="btn btn-primary">Update</a>
+            <a href="{% url 'product_delete' product.id %}" class="btn btn-primary" >Delete</a>
             <form method="post" action="{% url 'product_delete' product.id %}" style="display: inline;">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary" >Delete</button>

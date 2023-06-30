@@ -21,12 +21,7 @@
             <td>{{ order_item.product.price }}</td>
           </tr>
         {% endfor %}
-        <tr>
-          <td colspan="2" style="text-align: right;"><strong>Total Cost:</strong></td>
-          <td>{{ order.total_price }} Rs</td>
-        </tr>
       </tbody>
     </table>
-    <a href="{% url 'proced_order' order.id %}" class="btn btn-primary"><b>Proceed</b></a>
   </div>
 {% endblock %}
