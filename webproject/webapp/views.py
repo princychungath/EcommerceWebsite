@@ -21,7 +21,6 @@ class MySignUpView(CreateView):
     template_name = 'webapp/signup.html'
     success_url = reverse_lazy('login')
 
-
 @login_required    
 class MyLogoutView(LogoutView):
     pass
@@ -55,6 +54,17 @@ def productview(request):
     products = Product.objects.all()
     return render(request, 'webapp/productlist.html', {'products': products})
 
+
+@login_required
+def profile(request):
+    return render(request,'webapp/profile.html')
+
+@login_required
+def product_detail(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    return render(request, 'webapp/product_details.html', {'product': product})
+
+
 @login_required
 def add_to_cart(request,product_id):
     user=request.user
@@ -82,11 +92,10 @@ def cart_view(request):
     return render(request, 'webapp/cart.html', context)
 
 @login_required
-def delete_cart(request, item_id):
-    if request.method == 'POST':
-        cart_item = get_object_or_404(CartItem, id=item_id)
-        cart_item.delete()
-    return redirect('cart_view')
+def delete_cart(request,item_id):
+  cart_item= get_object_or_404(CartItem, id=item_id)
+  cart_item.delete()
+  return redirect("cart_view")
 
 @login_required  
 def update_cart(request, item_id):
@@ -101,16 +110,6 @@ def update_cart(request, item_id):
             cart_item.delete()
     return redirect('cart_view')
 
-@login_required
-def profile(request):
-    return render(request,'webapp/profile.html')
-
-@login_required
-def totalorder(request):
-    order_items = OrderItems.objects.all()
-    context = {'order_items': order_items}
-    return render(request, 'webapp/orderlists.html', context)
-
 
 
 @login_required
@@ -118,60 +117,35 @@ def order_view(request):
     user = request.user
     cart = user.cart
     cart_items = CartItem.objects.filter(cart=cart)
-    total_price = 0
-
+    total_price = sum(cart_item.product.price * cart_item.quantity for cart_item in cart_items)
+    print("Total Price:", total_price)
+    order = Order.objects.create(user=user, total_price=total_price)
     for cart_item in cart_items:
         product = cart_item.product
         quantity_to_buy = cart_item.quantity
-
-        if product.quantity >= quantity_to_buy:
-            total_price += product.price * quantity_to_buy
+        
+        if product.quantity > quantity_to_buy:
             product.quantity -= quantity_to_buy
             product.save()
             OrderItems.objects.create(order=order, product=product, quantity=quantity_to_buy)
-
-    order = Order.objects.create(user=user, total_price=total_price)
-
-    order_id = request.GET.get('order_id') or request.session.get('order_id')
-    if order_id:
-        order = Order.objects.get(id=order_id)
-        order_items = OrderItems.objects.filter(order=order)
-    else:
-        order_items = []
-
+    
+    cart_items.delete()
+    order_items = OrderItems.objects.filter(order=order)
     request.session['order_id'] = order.id
-
+    
     context = {
         'order': order,
         'order_items': order_items,
-        'total_price': total_price,
     }
     return render(request, 'webapp/order.html', context)
 
 
+@login_required
 def proced_order(request, order_id):
-    try:
-        order = Order.objects.get(id=order_id)
-    except Order.DoesNotExist:
-        return redirect('order_not_found')
-
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        number = request.POST.get('number')
-        payment = request.POST.get('payment')
-        items = request.POST.get('items')
-        total_cost = order.total_cost
-        order.name = name
-        order.number = number
-        order.payment = payment
-        order.items = items
-        order.total_cost = total_cost
-        order.save()
-        message = 'Order placed successfully!'
-        return HttpResponse(message)
-
+    order= get_object_or_404(Order, id=order_id) 
+    order_items = OrderItems.objects.filter(order=order)
     context = {
-        'order': order
+        'order': order,
     }
     return render(request, 'webapp/orderconf.html', context)
 
@@ -197,12 +171,6 @@ def viewproduct_adm(request):
 
 
 @login_required
-def product_detail(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    return render(request, 'webapp/product_details.html', {'product': product})
-
-
-@login_required
 def product_update(request, product_id):
     product = get_object_or_404(Product,id=product_id)
     if request.method == 'POST':
@@ -215,13 +183,17 @@ def product_update(request, product_id):
     return render(request, 'webapp/update.html', {'form': form})
 
 
-
 @login_required
-def product_delete(request,product_id):
-    product = get_object_or_404(product,id=product_id) 
+def product_delete(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    
     if request.method == 'POST':
         product.delete()
         return redirect('viewproduct_adm')
+    
+    context = {'product': product}
+    return render(request, 'delete_confirmation.html', context)
+
 
 
 @login_required
@@ -230,13 +202,25 @@ def customers(request):
     return render(request,'webapp/customers.html', {'customers': customers})
 
 
+@login_required
+def totalorder(request):
+    order_items = OrderItems.objects.all()
+    context = {'order_items': order_items}
+    return render(request, 'webapp/orderlists.html', context)
 
 
-
-
-
-
-
+@login_required
+def address(request,order_id):
+    if request.method == 'POST':
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            customer = form.save(commit=False)
+            customer.author = request.user
+            customer.save()
+            return redirect('proced_order')
+    else:
+        form = OrderForm()
+    return render(request, 'webapp/address.html', {'form': form,'order_id':order_id})
 
 
 

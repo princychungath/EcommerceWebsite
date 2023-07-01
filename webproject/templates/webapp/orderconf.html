@@ -1,8 +1,16 @@
 {% extends 'webapp/base.html' %}
+
 {% block content %}
-    <form method="post" action="{% url 'proced_order' order.id %}">
-        {% csrf_token %}
-        {{ form }}
-    <button type="submit" class="btn btn-primary">Place Order</button>
-    </form>
+<div class="container" style="margin-left: 200px; width: max-content;">
+  <div class="alert alert-success alert-sm " role="alert" >
+    Order confirmed!
+    <br>
+    Your order ID: {{ order.id }}
+    <br>
+    Please keep this ID for further reference.
+    <h2>Thank You !</h2>
+  </div>
+</div>
 {% endblock %}
+
+

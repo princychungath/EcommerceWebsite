@@ -28,11 +28,7 @@
                             {% csrf_token %}
                             <input type="number" min="1" value="{{ cart_item.quantity }}" name="quantity">
                             <button type="submit">quantity</button>
-                            <form method="post" action="{% url 'delete_cart' cart_item.id %}" name="delete">
-                                {% csrf_token %}
-                                <button type="submit" >Delete</button>
-                            </form>
-                            </form>
+                            <a href="{% url 'delete_cart' cart_item.id %}" class="btn btn-danger" >Delete</a>
                         </td>
                     </tr> 
                 </table>
