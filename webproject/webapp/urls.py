@@ -18,6 +18,7 @@ urlpatterns = [
     path('order_view/',views.order_view, name='order_view'),
     path('address/<int:order_id>',views.address,name='address'),
     path('proced_order/<int:order_id>',views.proced_order,name='proced_order'),
+    path('totalorder',views.totalorder,name='totalorder'),
 
     path('addproduct_adm',views.addproduct_adm,name='addproduct_adm'),
     path('viewproduct_adm',views.viewproduct_adm,name='viewproduct_adm'),
@@ -25,7 +26,8 @@ urlpatterns = [
     path('update/<int:product_id>/', views.product_update, name='product_update'),
     path('remove/<int:product_id>/', views.product_delete, name='product_delete'),
     path('customers/',views.customers,name='customers'),
-    path('totalorder',views.totalorder,name='totalorder'),
+    path('orderlists/',views.total_orders,name='total_orders')
+    
 ]
 
 

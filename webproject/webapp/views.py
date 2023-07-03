@@ -50,6 +50,8 @@ class LoginView(View):
 def adminhome(request):
     return render(request,'webapp/adminhome.html')
 
+
+@login_required
 def productview(request):
     products = Product.objects.all()
     return render(request, 'webapp/productlist.html', {'products': products})
@@ -58,6 +60,7 @@ def productview(request):
 @login_required
 def profile(request):
     return render(request,'webapp/profile.html')
+
 
 @login_required
 def product_detail(request, product_id):
@@ -81,6 +84,7 @@ def add_to_cart(request,product_id):
         CartItem.objects.create(cart=cart,product=product,quantity=1)
     return redirect('cart_view')
 
+
 @login_required
 def cart_view(request):
     user = request.user
@@ -97,6 +101,7 @@ def delete_cart(request,item_id):
   cart_item.delete()
   return redirect("cart_view")
 
+
 @login_required  
 def update_cart(request, item_id):
     if request.method == 'POST':
@@ -111,7 +116,6 @@ def update_cart(request, item_id):
     return redirect('cart_view')
 
 
-
 @login_required
 def order_view(request):
     user = request.user
@@ -124,7 +128,7 @@ def order_view(request):
         product = cart_item.product
         quantity_to_buy = cart_item.quantity
         
-        if product.quantity > quantity_to_buy:
+        if product.quantity >= quantity_to_buy:
             product.quantity -= quantity_to_buy
             product.save()
             OrderItems.objects.create(order=order, product=product, quantity=quantity_to_buy)
@@ -141,9 +145,23 @@ def order_view(request):
 
 
 @login_required
+def address(request, order_id):
+    order= get_object_or_404(Order, id=order_id) 
+    if request.method == 'POST':
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            address = form.cleaned_data['address']
+            phone_number = form.cleaned_data['phone_number']
+            payment_method = form.cleaned_data['payment_method']
+    else:
+        form = OrderForm()
+    return render(request, 'webapp/address.html', {'form': form, 'order_id': order_id})
+
+
+@login_required
 def proced_order(request, order_id):
     order= get_object_or_404(Order, id=order_id) 
-    order_items = OrderItems.objects.filter(order=order)
     context = {
         'order': order,
     }
@@ -151,17 +169,30 @@ def proced_order(request, order_id):
 
 
 @login_required
+def totalorder(request):
+    order_items = OrderItems.objects.all()
+    context = {'order_items': order_items}
+    return render(request, 'webapp/orderlists.html', context)
+
+
+@login_required
 def addproduct_adm(request):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            return redirect('viewproduct_adm')
+            price = form.cleaned_data['price']
+            quantity = form.cleaned_data['quantity']
+
+            if price >= 1 and quantity >= 1:
+                form.save()
+                return redirect('viewproduct_adm')
+            else:
+                form.add_error(None, "Price and quantity must be greater than or equal to 1.")
     else:
         form = ProductForm()
+
     return render(request, 'webapp/admin_addproduct.html', {'form': form})
+
 
 
 @login_required   
@@ -184,16 +215,10 @@ def product_update(request, product_id):
 
 
 @login_required
-def product_delete(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    
-    if request.method == 'POST':
-        product.delete()
-        return redirect('viewproduct_adm')
-    
-    context = {'product': product}
-    return render(request, 'delete_confirmation.html', context)
-
+def product_delete(request,product_id):
+  product= get_object_or_404(Product, id=product_id)
+  product.delete()
+  return redirect("viewproduct_adm")
 
 
 @login_required
@@ -201,26 +226,12 @@ def customers(request):
     customers =User.objects.all()
     return render(request,'webapp/customers.html', {'customers': customers})
 
-
 @login_required
-def totalorder(request):
-    order_items = OrderItems.objects.all()
-    context = {'order_items': order_items}
-    return render(request, 'webapp/orderlists.html', context)
+def total_orders(request):
+    orders = Order.objects.all()
+    context = {'orders': orders}
+    return render(request, 'webapp/total_orders.html', context)
 
-
-@login_required
-def address(request,order_id):
-    if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            customer = form.save(commit=False)
-            customer.author = request.user
-            customer.save()
-            return redirect('proced_order')
-    else:
-        form = OrderForm()
-    return render(request, 'webapp/address.html', {'form': form,'order_id':order_id})
 
 
 

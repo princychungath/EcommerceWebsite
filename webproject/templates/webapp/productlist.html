@@ -16,9 +16,13 @@
           <li class="list-group-item"><b>product Name       :      </b>{{ product.name }}</li>
           <li class="list-group-item"><b>product description  :      </b>{{ product.description }}</li>
           <li class="list-group-item"><b>product price        :      </b>:{{ product.price}}</li>
-          <li class="list-group-item"><b>product quantity     :      </b>:{{ product.quantity}}</li>
+          {% if product.quantity >= 1 %}
+            <li class="list-group-item"><b>product quantity     :      </b>:{{ product.quantity}}</li>
+            <a href="{% url 'addcart' product.id %}" class="btn btn-primary" >Add to CART</a>
+          {% else %}
+            <li class="list-group-item"><b>product quantity     :Out of Stock !</li>
+          {% endif %}
         </ul>
-        <a href="{% url 'addcart' product.id %}" class="btn btn-primary" >Add to CART</a>
       </div>
     </div>
     {% if forloop.counter|divisibleby:2 and not forloop.last %}

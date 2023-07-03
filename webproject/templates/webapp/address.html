@@ -1,28 +1,28 @@
 {% extends 'webapp/base.html' %}
+
 {% block content %}
-<div class="container justify-content-center" style="margin-left: 200px; >
-    <div class="col-md-4">
-        <h2>Please Fill the Form </h2>
-        <form method="post" enctype="multipart/form-data" class="mt-4" >
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="{{ form.name.id_for_label }}" class="form-label" >{{ form.name.label }}</label>
-                {{ form.name }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ form.address.id_for_label }}" class="form-label" >{{ form.address.label }}</label>
-                {{ form.address }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ form.phone_number.id_for_label }}" class="form-label">{{ form.phone_number.label }}</label>
-                {{ form.phone_number }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ form.payment_method.id_for_label }}" class="form-label">{{ form.payment_method.label }}</label>
-                {{ form.payment_method }}
-            </div>
-            <a href="{% url 'proced_order' order_id %}"  class="btn btn-primary"> click for Confirm</button>
-        </form>
+    <div class="container justify-content-center" style="margin-left: 200px;">
+        <div class="col-md-4">
+            <h2>Please Fill the Form</h2>
+            <form method="post" enctype="multipart/form-data" class="mt-4" action="{% url 'proced_order' order_id=order_id %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+                    {{ form.name }}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.address.id_for_label }}" class="form-label">{{ form.address.label }}</label>
+                    {{ form.address }}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.phone_number.id_for_label }}" class="form-label">{{ form.phone_number.label }}</label>
+                    {{ form.phone_number }}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.payment_method.id_for_label }}" class="form-label">{{ form.payment_method.label }}</label>
+                    {{ form.payment_method }}
+                </div>
+                <button class="btn btn-primary">Click to Confirm</button>
+            </form>
+        </div>
     </div>
-</div>
-{% endblock %}

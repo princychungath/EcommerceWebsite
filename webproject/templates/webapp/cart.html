@@ -26,7 +26,7 @@
                         <td>
                             <form method="POST" action="{% url 'update_cart' cart_item.id %}">
                             {% csrf_token %}
-                            <input type="number" min="1" value="{{ cart_item.quantity }}" name="quantity">
+                            <input type="number" min="1" value="{{ cart_item.quantity }}" name="quantity" oninput="this.form.submit()">
                             <button type="submit">quantity</button>
                             <a href="{% url 'delete_cart' cart_item.id %}" class="btn btn-danger" >Delete</a>
                         </td>
@@ -37,7 +37,7 @@
                 <a href="{% url 'order_view' %}" class="btn btn-danger">Order Now</a>
             </div>
         {% else %}
-            <class="mt-4"><br>Your cart empty! </h1>   
+            <class="mt-4"><br>Your cart empty! </h1>
         {% endif %}
     </div>
 {% endblock %}

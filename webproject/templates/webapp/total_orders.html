@@ -1,0 +1,25 @@
+{% extends 'webapp/adminhome.html' %}
+
+{% block content %}
+  <div class="container">
+    <h2>Order List</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th class="pl-4 border-top">User</th>
+          <th class="border-top">Total Price</th>
+          <th class="border-top">Ordered At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+          <tr>
+            <td>{{ order.user }}</td>
+            <td>{{ order.total_price }}</td>
+            <td>{{ order.orderd_at }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

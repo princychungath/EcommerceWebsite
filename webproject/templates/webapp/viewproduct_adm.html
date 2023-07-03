@@ -16,7 +16,11 @@
             <h5 class="card-title">{{ product.name }}</h5>
             <p class="card-text">description: {{ product.description }}</p>
             <p class="card-text">price: {{ product.price }}</p>
-            <p class="card-text">quantity: {{ product.quantity }}</p>
+            {% if product.quantity >= 1 %}
+              <p class="card-text">quantity: {{ product.quantity }}</p>
+            {% else %}
+              <b><p class="card-text">quantity :Out of Stock !</p></b>
+            {% endif %}
             <div class="text-center">
               <a href="{% url 'product_detail' product.id %}" class="btn btn-primary">View Details</a>
             </div>
